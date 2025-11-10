@@ -49,6 +49,7 @@ namespace StockAPI.Consumers
                 ISendEndpoint sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Payment_StockReservedEventQueue}"));
                 await sendEndpoint.Send(stockReservedEvent);
 
+                Console.WriteLine("Stock Reserved");
             }
             else
             {
@@ -60,6 +61,8 @@ namespace StockAPI.Consumers
                     Message = "Not enough stock"
                 };
                 await _publishEndpoint.Publish(stockNotReservedEvent);
+
+                Console.WriteLine("Stock Not Reserved");
             }
         }
     }

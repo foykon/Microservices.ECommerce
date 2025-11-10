@@ -29,7 +29,7 @@ namespace Order.API.Controllers
                 OrderId = Guid.NewGuid(),
                 BuyerId = createOrder.BuyerId,
                 CreateDate = DateTime.Now,
-                OrderStatus = Models.Entitites.Enums.OrderStatus.Completed,
+                OrderStatus = Models.Entitites.Enums.OrderStatus.Suspend,
 
                 
             };
