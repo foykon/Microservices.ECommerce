@@ -1,10 +1,6 @@
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
-using Order.API.Consumer;
-using Order.API.Models;
+using Payment.API.Consumers;
 using Shared;
-using Shared.Events;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,20 +11,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<OrderAPIDbContext>(options=>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer"));
-});
-
 builder.Services.AddMassTransit(configure =>
 {
-    configure.AddConsumer<PaymentCompletedEventConsumer>();
     configure.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMQ"]);
         cfg.ReceiveEndpoint(RabbitMQSettings.Payment_StockReservedEventQueue, e =>
         {
-            e.ConfigureConsumer<PaymentCompletedEventConsumer>(context);
+            e.ConfigureConsumer<StockReservedEventConsumer>(context);
         });
     });
 });
