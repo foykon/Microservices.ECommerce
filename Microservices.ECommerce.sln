@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.API", "Order.API\Orde
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{FE282460-0349-4753-AFDE-9680C77CBBD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockAPI", "StockAPI\StockAPI.csproj", "{6CC9EC6A-2DF3-4A5A-9A81-6199E51F228A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.API", "StockAPI\Stock.API.csproj", "{6CC9EC6A-2DF3-4A5A-9A81-6199E51F228A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
