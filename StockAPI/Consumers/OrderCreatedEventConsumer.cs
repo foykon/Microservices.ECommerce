@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using MongoDB.Driver;
+using Shared;
 using Shared.Events;
 using Shared.Messages;
 using StockAPI.Models;
@@ -10,10 +11,12 @@ namespace StockAPI.Consumers
     public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
     {
         IMongoCollection<Stock> _stockCollection;
+        readonly ISendEndpointProvider _sendEndpointProvider;
 
-        public OrderCreatedEventConsumer(MongoDBService mongoDBService)
+        public OrderCreatedEventConsumer(MongoDBService mongoDBService, ISendEndpointProvider sendEndpointProvider)
         {
             _stockCollection = mongoDBService.GetCollection<Stock>();
+            _sendEndpointProvider = sendEndpointProvider;
         }
 
         public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
@@ -34,7 +37,16 @@ namespace StockAPI.Consumers
 
                 }
 
-                // Payment
+                StockReservedEvent stockReservedEvent = new()
+                {
+                    OrderId =  context.Message.OrderId,
+                    BuyerId = context.Message.BuyerId,
+                    TotalPrice = context.Message.TotalPrice
+                };
+                
+                ISendEndpoint sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Payment_StockReservedEventQueue}"));
+                await sendEndpoint.Send(stockReservedEvent);
+
             }
             else
             {
