@@ -12,11 +12,13 @@ namespace StockAPI.Consumers
     {
         IMongoCollection<Stock> _stockCollection;
         readonly ISendEndpointProvider _sendEndpointProvider;
+        readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderCreatedEventConsumer(MongoDBService mongoDBService, ISendEndpointProvider sendEndpointProvider)
+        public OrderCreatedEventConsumer(MongoDBService mongoDBService, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _stockCollection = mongoDBService.GetCollection<Stock>();
             _sendEndpointProvider = sendEndpointProvider;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
@@ -50,7 +52,14 @@ namespace StockAPI.Consumers
             }
             else
             {
-
+                
+                StockNotReservedEvent stockNotReservedEvent = new()
+                {
+                    OrderId = context.Message.OrderId,
+                    BuyerId = context.Message.BuyerId,
+                    Message = "Not enough stock"
+                };
+                await _publishEndpoint.Publish(stockNotReservedEvent);
             }
         }
     }

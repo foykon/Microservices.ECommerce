@@ -5,19 +5,18 @@ using Shared.Events;
 
 namespace Order.API.Consumer
 {
-    public class PaymentCompletedEventConsumer : IConsumer<Shared.Events.PaymentCompletedEvent>
+    public class StockNotReservedEventConsumer : IConsumer<Shared.Events.StockNotReservedEvent>
     {
         readonly OrderAPIDbContext _context;
 
-        public PaymentCompletedEventConsumer(OrderAPIDbContext context)
+        public StockNotReservedEventConsumer(OrderAPIDbContext context)
         {
             _context = context;
         }
-
-        public async Task Consume(ConsumeContext<PaymentCompletedEvent> context)
+        public async Task Consume(ConsumeContext<StockNotReservedEvent> context)
         {
             Models.Entitites.Order order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == context.Message.OrderId);
-            order.OrderStatus = Models.Entitites.Enums.OrderStatus.Completed;
+            order.OrderStatus = Models.Entitites.Enums.OrderStatus.Failed;
             await _context.SaveChangesAsync();
         }
     }

@@ -23,12 +23,17 @@ builder.Services.AddDbContext<OrderAPIDbContext>(options=>
 builder.Services.AddMassTransit(configure =>
 {
     configure.AddConsumer<PaymentCompletedEventConsumer>();
+    configure.AddConsumer<StockNotReservedEventConsumer>();
     configure.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMQ"]);
-        cfg.ReceiveEndpoint(RabbitMQSettings.Payment_StockReservedEventQueue, e =>
+        cfg.ReceiveEndpoint(RabbitMQSettings.Order_PaymentCompletedEventQueue, e =>
         {
             e.ConfigureConsumer<PaymentCompletedEventConsumer>(context);
+        });
+        cfg.ReceiveEndpoint(RabbitMQSettings.Order_StockNotReservedEventQueue, e =>
+        {
+            e.ConfigureConsumer<StockNotReservedEventConsumer>(context);
         });
     });
 });
