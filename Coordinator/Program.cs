@@ -1,12 +1,9 @@
 using Coordinator.Models.Context;
+using Coordinator.Services.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -15,19 +12,37 @@ builder.Services.AddDbContext<TwoPhaseCommitContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer"));
 });
 
+builder.Services.AddHttpClient("Order.API", client => client.BaseAddress = new Uri(builder.Configuration["Services:Order.API"]));
+builder.Services.AddHttpClient("Stock.API", client => client.BaseAddress = new Uri(builder.Configuration["Services:Stock.API"]));
+builder.Services.AddHttpClient("Payment.API", client => client.BaseAddress = new Uri(builder.Configuration["Services:Payment.API"]));
+
+builder.Services.AddSingleton<Coordinator.Services.Abstraction.ITransactionService, Coordinator.Services.Concrete.TransactionService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.MapGet("/create-order-transaction", async (ITransactionService transactionService) =>
+{
+    //Phase 1 - Prepare
+    var transactionId = await transactionService.CreateTransactionAsync();
+    await transactionService.PrepareServicesAsync(transactionId);
+    bool transactionState = await transactionService.CheckReadyServicesAsync(transactionId);
 
-app.MapControllers();
+    if (transactionState)
+    {
+        //Phase 2 - Commit
+        await transactionService.CommitAsync(transactionId);
+        transactionState = await transactionService.CheckTransactionStateAsync(transactionId);
+    }
+
+    if (!transactionState)
+        await transactionService.RollbackAsync(transactionId);
+});
 
 app.Run();
