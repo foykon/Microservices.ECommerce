@@ -16,7 +16,7 @@ builder.Services.AddHttpClient("Order.API", client => client.BaseAddress = new U
 builder.Services.AddHttpClient("Stock.API", client => client.BaseAddress = new Uri(builder.Configuration["Services:Stock.API"]));
 builder.Services.AddHttpClient("Payment.API", client => client.BaseAddress = new Uri(builder.Configuration["Services:Payment.API"]));
 
-builder.Services.AddSingleton<Coordinator.Services.Abstraction.ITransactionService, Coordinator.Services.Concrete.TransactionService>();
+builder.Services.AddTransient<Coordinator.Services.Abstraction.ITransactionService, Coordinator.Services.Concrete.TransactionService>();
 
 var app = builder.Build();
 

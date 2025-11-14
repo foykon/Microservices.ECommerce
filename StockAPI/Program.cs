@@ -79,5 +79,18 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapGet("/ready", () =>
+{
+    Console.WriteLine("Stcok.API is ready.");
+    return false;
+});
+app.MapGet("/commit", () =>
+{
+    Console.WriteLine("Stcok.API is commited.");
+    return true;
+});
+app.MapGet("/rollback", () =>
+{
+    Console.WriteLine("Stcok.API is rollbacked.");
+});
 app.Run();

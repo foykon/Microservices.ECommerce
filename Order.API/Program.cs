@@ -58,4 +58,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/ready", () =>
+{
+    Console.WriteLine("Order.API is ready.");
+    return true;
+});
+app.MapGet("/commit", () =>
+{
+    Console.WriteLine("Order.API is commited.");
+    return true;
+});
+app.MapGet("/rollback", () =>
+{
+    Console.WriteLine("Order.API is rollbacked.");
+});
+
+
 app.Run();

@@ -38,5 +38,18 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapGet("/ready", () =>
+{
+    Console.WriteLine("Payment.API is ready.");
+    return true;
+});
+app.MapGet("/commit", () =>
+{
+    Console.WriteLine("Payment.API is commited.");
+    return true;
+});
+app.MapGet("/rollback", () =>
+{
+    Console.WriteLine("Payment.API is rollbacked.");
+});
 app.Run();
